@@ -7,24 +7,30 @@ export const app = new Frog({
 })
 
 const templates = [
-  "https://imgflip.com/s/meme/Distracted-Boyfriend.jpg",
-  "https://i.imgflip.com/8imkrc.jpg",
-  "https://imgflip.com/s/meme/Sad-Pablo-Escobar.jpg",
-  "https://imgflip.com/s/meme/Change-My-Mind.jpg"
+  "https://tinypng.com/backend/opt/download/t2fvs2fw3pcy4aem9c6sbrknh6segt3w/Sad-Pablo-Escobar.jpg",
+  "https://tinypng.com/backend/opt/download/4w7xj7kwa1g8qpj2gtey4bgvpravp4bf/Distracted-Boyfriend.jpg",
+  "https://tinypng.com/backend/opt/download/wk0n34xkehxgcnr8yxc18sq392a02rvd/Always-Has-Been%20(1).png",
+  "https://tinypng.com/backend/opt/download/bp0s8x32vt03sravj9jvp78vrpv7ebw4/imagebase.jpg"
 ]
+
+var activeTemplate = templates[0]
 
 app.frame('/', (c) => {
   const { inputText, status, buttonValue } = c
 
+  // If the button value is "change", change the active template
+  if (buttonValue === "change") {
+    activeTemplate = templates[Math.floor(Math.random() * templates.length)]
+  }
+
   // Get a random image URL from the templates array
-  const randomImageUrl = buttonValue || templates[Math.floor(Math.random() * templates.length)]
+  const randomImageUrl = activeTemplate || templates[Math.floor(Math.random() * templates.length)]
 
   return c.res({
     image: (
       <div
         style={{
           display: 'flex',
-          background: 'black',
           width: '100%',
           height: '100%',
           flexDirection: 'column',
@@ -32,45 +38,30 @@ app.frame('/', (c) => {
           alignItems:"center"
         }}
       >
-        <div
-          style={{
-            backgroundImage: `url('${randomImageUrl}')`,
-            backgroundSize: 'cover',
-            display: 'flex',
-            flexDirection: 'column',
-            height: '100%',
-            justifyContent: 'flex-end',
-            textAlign: 'center',
-            width: '100%',
-            backgroundRepeat: 'no-repeat',
-          }}
-        >
-          {(inputText && status === "response") ? (
-            <div
-              style={{
-                backgroundColor: 'rgba(0, 0, 0, 0.7)',
-                color: 'white',
-                fontSize: 40,
-                fontWeight: 'bold',
-                lineHeight: 1.4,
-                padding: '20px',
-                textShadow: '2px 2px 4px rgba(0, 0, 0, 0.8)',
-                whiteSpace: 'pre-wrap',
-                width: '100%',
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
-            >
-              {inputText}
-            </div>
-          ) : <></>}
-        </div>
+        <img src={randomImageUrl} width="30%" height="30%"/>
+        {(inputText && status === "response") ? (
+          <div
+            style={{
+              color: 'white',
+              fontSize: 40,
+              fontWeight: 'bold',
+              lineHeight: 1.4,
+              padding: '20px',
+              whiteSpace: 'pre-wrap',
+              width: '100%',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            {inputText}
+          </div>
+        ) : <></>}
       </div>
     ),
     intents: [
       <TextInput placeholder="Enter meme text..." />,
-      <Button value={randomImageUrl}>Submit</Button>,
-      <Button value={templates[Math.floor(Math.random() * templates.length)]}>Change Background</Button>,
+      <Button>Submit</Button>,
+      <Button value="change">Change Background</Button>,
       status === 'response' && <Button.Reset>Reset</Button.Reset>,
     ],
   })
