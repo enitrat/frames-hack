@@ -1,64 +1,76 @@
 import { Button, Frog, TextInput } from 'frog'
-// import { neynar } from 'frog/hubs'
 import { handle } from 'frog/vercel'
-
-// Uncomment to use Edge Runtime.
-// export const config = {
-//   runtime: 'edge',
-// }
 
 export const app = new Frog({
   assetsPath: '/',
   basePath: '/api',
-  // Supply a Hub to enable frame verification.
-  // hub: neynar({ apiKey: 'NEYNAR_FROG_FM' })
 })
 
+const templates = [
+  "https://imgflip.com/s/meme/Distracted-Boyfriend.jpg",
+  "https://i.imgflip.com/8imkrc.jpg",
+  "https://imgflip.com/s/meme/Sad-Pablo-Escobar.jpg",
+  "https://imgflip.com/s/meme/Change-My-Mind.jpg"
+]
+
 app.frame('/', (c) => {
-  const { buttonValue, inputText, status } = c
-  const fruit = inputText || buttonValue
+  const { inputText, status, buttonValue } = c
+
+  // Get a random image URL from the templates array
+  const randomImageUrl = buttonValue || templates[Math.floor(Math.random() * templates.length)]
+
   return c.res({
     image: (
       <div
         style={{
-          alignItems: 'center',
-          background:
-            status === 'response'
-              ? 'linear-gradient(to right, #432889, #17101F)'
-              : 'black',
-          backgroundSize: '100% 100%',
           display: 'flex',
-          flexDirection: 'column',
-          flexWrap: 'nowrap',
-          height: '100%',
-          justifyContent: 'center',
-          textAlign: 'center',
+          background: 'black',
           width: '100%',
+          height: '100%',
+          flexDirection: 'column',
+          justifyContent:"center",
+          alignItems:"center"
         }}
       >
         <div
           style={{
-            color: 'white',
-            fontSize: 60,
-            fontStyle: 'normal',
-            letterSpacing: '-0.025em',
-            lineHeight: 1.4,
-            marginTop: 30,
-            padding: '0 120px',
-            whiteSpace: 'pre-wrap',
+            backgroundImage: `url('${randomImageUrl}')`,
+            backgroundSize: 'cover',
+            display: 'flex',
+            flexDirection: 'column',
+            height: '100%',
+            justifyContent: 'flex-end',
+            textAlign: 'center',
+            width: '100%',
+            backgroundRepeat: 'no-repeat',
           }}
         >
-          {status === 'response'
-            ? `Nice choice.${fruit ? ` ${fruit.toUpperCase()}!!` : ''}`
-            : 'Welcome!'}
+          {(inputText && status === "response") ? (
+            <div
+              style={{
+                backgroundColor: 'rgba(0, 0, 0, 0.7)',
+                color: 'white',
+                fontSize: 40,
+                fontWeight: 'bold',
+                lineHeight: 1.4,
+                padding: '20px',
+                textShadow: '2px 2px 4px rgba(0, 0, 0, 0.8)',
+                whiteSpace: 'pre-wrap',
+                width: '100%',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              {inputText}
+            </div>
+          ) : <></>}
         </div>
       </div>
     ),
     intents: [
-      <TextInput placeholder="Enter custom fruit..." />,
-      <Button value="apples">Apples</Button>,
-      <Button value="oranges">Oranges</Button>,
-      <Button value="bananas">Bananas</Button>,
+      <TextInput placeholder="Enter meme text..." />,
+      <Button value={randomImageUrl}>Submit</Button>,
+      <Button value={templates[Math.floor(Math.random() * templates.length)]}>Change Background</Button>,
       status === 'response' && <Button.Reset>Reset</Button.Reset>,
     ],
   })
